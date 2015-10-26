@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2012 the original author or authors.
+ * Copyright 2002-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,7 +109,7 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 		this.target = target;
 		this.targetClass = targetClass;
 		this.method = BridgeMethodResolver.findBridgedMethod(method);
-		this.arguments = arguments;
+		this.arguments = AopProxyUtils.adaptArgumentsIfNecessary(method, arguments);
 		this.interceptorsAndDynamicMethodMatchers = interceptorsAndDynamicMethodMatchers;
 	}
 
