@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,13 +53,14 @@ import org.springframework.web.servlet.FlashMapManager;
 import org.springframework.web.servlet.support.SessionFlashMapManager;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.util.UriUtils;
+import org.springframework.web.util.UrlPathHelper;
 
 /**
- * Default builder for {@link MockHttpServletRequest} required as input to perform
- * requests in {@link MockMvc}.
+ * Default builder for {@link MockHttpServletRequest} required as input to
+ * perform requests in {@link MockMvc}.
  *
- * <p>Application tests will typically access this builder through the static factory
- * methods in {@link MockMvcRequestBuilders}.
+ * <p>Application tests will typically access this builder through the static
+ * factory methods in {@link MockMvcRequestBuilders}.
  *
  * @author Rossen Stoyanchev
  * @author Arjen Poutsma
@@ -70,6 +71,8 @@ public class MockHttpServletRequestBuilder
 		implements ConfigurableSmartRequestBuilder<MockHttpServletRequestBuilder>, Mergeable {
 
 	private final HttpMethod method;
+
+	private static final UrlPathHelper urlPathHelper = new UrlPathHelper();
 
 	private final URI url;
 
@@ -679,7 +682,8 @@ public class MockHttpServletRequestBuilder
 			Assert.isTrue(requestUri.startsWith(this.contextPath + this.servletPath),
 					"Invalid servletPath [" + this.servletPath + "] for requestURI [" + requestUri + "]");
 			String extraPath = requestUri.substring(this.contextPath.length() + this.servletPath.length());
-			this.pathInfo = (StringUtils.hasText(extraPath)) ? extraPath : null;
+			this.pathInfo = (StringUtils.hasText(extraPath) ?
+					urlPathHelper.decodeRequestString(request, extraPath) : null);
 		}
 		request.setPathInfo(this.pathInfo);
 	}
