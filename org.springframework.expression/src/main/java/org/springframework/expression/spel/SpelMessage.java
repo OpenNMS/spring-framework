@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009 the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,8 @@ import java.text.MessageFormat;
  * </code> The prefix captures the code and the error kind, whilst the position is included if it is known.
  * 
  * @author Andy Clement
+ * @author Juergen Hoeller
+ * @author Sam Brannen
  * @since 3.0
  */
 public enum SpelMessage {
@@ -78,33 +80,47 @@ public enum SpelMessage {
 	NOT_A_REAL(Kind.ERROR, 1040, "The value ''{0}'' cannot be parsed as a double"), // 
 	MORE_INPUT(Kind.ERROR,1041, "After parsing a valid expression, there is still more data in the expression: ''{0}''"),
 	RIGHT_OPERAND_PROBLEM(Kind.ERROR,1042, "Problem parsing right operand"),
-	NOT_EXPECTED_TOKEN(Kind.ERROR,1043,"Unexpected token.  Expected ''{0}'' but was ''{1}''"),
-	OOD(Kind.ERROR,1044,"Unexpectedly ran out of input"), //
-	NON_TERMINATING_DOUBLE_QUOTED_STRING(Kind.ERROR,1045,"Cannot find terminating \" for string"),//
-	NON_TERMINATING_QUOTED_STRING(Kind.ERROR,1046,"Cannot find terminating ' for string"), //
-	MISSING_LEADING_ZERO_FOR_NUMBER(Kind.ERROR,1047,"A real number must be prefixed by zero, it cannot start with just ''.''"), //
-	REAL_CANNOT_BE_LONG(Kind.ERROR,1048,"Real number cannot be suffixed with a long (L or l) suffix"),//
-	UNEXPECTED_DATA_AFTER_DOT(Kind.ERROR,1049,"Unexpected data after ''.'': ''{0}''"),//
-	MISSING_CONSTRUCTOR_ARGS(Kind.ERROR,1050,"The arguments '(...)' for the constructor call are missing"),//
-	RUN_OUT_OF_ARGUMENTS(Kind.ERROR,1051,"Unexpected ran out of arguments"),//
-	UNABLE_TO_GROW_COLLECTION(Kind.ERROR,1052,"Unable to grow collection"),//
-	UNABLE_TO_GROW_COLLECTION_UNKNOWN_ELEMENT_TYPE(Kind.ERROR,1053,"Unable to grow collection: unable to determine list element type"),//
-	UNABLE_TO_CREATE_LIST_FOR_INDEXING(Kind.ERROR,1054,"Unable to dynamically create a List to replace a null value"),//
-	UNABLE_TO_CREATE_MAP_FOR_INDEXING(Kind.ERROR,1055,"Unable to dynamically create a Map to replace a null value"),//
-	UNABLE_TO_DYNAMICALLY_CREATE_OBJECT(Kind.ERROR,1056,"Unable to dynamically create instance of ''{0}'' to replace a null value"),//
-	NO_BEAN_RESOLVER_REGISTERED(Kind.ERROR,1057,"No bean resolver registered in the context to resolve access to bean ''{0}''"),//
-	EXCEPTION_DURING_BEAN_RESOLUTION(Kind.ERROR, 1058, "A problem occurred when trying to resolve bean ''{0}'':''{1}''"), // 
-	INVALID_BEAN_REFERENCE(Kind.ERROR,1059,"@ can only be followed by an identifier or a quoted name"),//
-	TYPE_NAME_EXPECTED_FOR_ARRAY_CONSTRUCTION(Kind.ERROR, 1060,
-			"Expected the type of the new array to be specified as a String but found ''{0}''"), //
-	INCORRECT_ELEMENT_TYPE_FOR_ARRAY(Kind.ERROR, 1061,
-			"The array of type ''{0}'' cannot have an element of type ''{1}'' inserted"), //
-	MULTIDIM_ARRAY_INITIALIZER_NOT_SUPPORTED(Kind.ERROR, 1062,
-			"Using an initializer to build a multi-dimensional array is not currently supported"), //
-	MISSING_ARRAY_DIMENSION(Kind.ERROR, 1063, "A required array dimension has not been specified"), //
-	INITIALIZER_LENGTH_INCORRECT(
-			Kind.ERROR, 1064, "array initializer size does not match array dimensions"), //
-	;
+	NOT_EXPECTED_TOKEN(Kind.ERROR,1043,"Unexpected token. Expected ''{0}'' but was ''{1}''"),
+	OOD(Kind.ERROR,1044,"Unexpectedly ran out of input"),
+	NON_TERMINATING_DOUBLE_QUOTED_STRING(Kind.ERROR,1045,"Cannot find terminating \" for string"),
+	NON_TERMINATING_QUOTED_STRING(Kind.ERROR,1046,"Cannot find terminating ' for string"),
+	MISSING_LEADING_ZERO_FOR_NUMBER(Kind.ERROR,1047,"A real number must be prefixed by zero, it cannot start with just ''.''"),
+	REAL_CANNOT_BE_LONG(Kind.ERROR,1048,"Real number cannot be suffixed with a long (L or l) suffix"),
+	UNEXPECTED_DATA_AFTER_DOT(Kind.ERROR,1049,"Unexpected data after ''.'': ''{0}''"),
+	MISSING_CONSTRUCTOR_ARGS(Kind.ERROR,1050,"The arguments '(...)' for the constructor call are missing"),
+	RUN_OUT_OF_ARGUMENTS(Kind.ERROR,1051,"Unexpected ran out of arguments"),
+	UNABLE_TO_GROW_COLLECTION(Kind.ERROR,1052,"Unable to grow collection"),
+	UNABLE_TO_GROW_COLLECTION_UNKNOWN_ELEMENT_TYPE(Kind.ERROR,1053,"Unable to grow collection: unable to determine list element type"),
+	UNABLE_TO_CREATE_LIST_FOR_INDEXING(Kind.ERROR,1054,"Unable to dynamically create a List to replace a null value"),
+	UNABLE_TO_CREATE_MAP_FOR_INDEXING(Kind.ERROR,1055,"Unable to dynamically create a Map to replace a null value"),
+	UNABLE_TO_DYNAMICALLY_CREATE_OBJECT(Kind.ERROR,1056,"Unable to dynamically create instance of ''{0}'' to replace a null value"),
+	NO_BEAN_RESOLVER_REGISTERED(Kind.ERROR,1057,"No bean resolver registered in the context to resolve access to bean ''{0}''"),
+	EXCEPTION_DURING_BEAN_RESOLUTION(Kind.ERROR, 1058, "A problem occurred when trying to resolve bean ''{0}'':''{1}''"),
+	INVALID_BEAN_REFERENCE(Kind.ERROR,1059,"@ can only be followed by an identifier or a quoted name"),
+	TYPE_NAME_EXPECTED_FOR_ARRAY_CONSTRUCTION(Kind.ERROR, 1060, "Expected the type of the new array to be specified as a String but found ''{0}''"),
+	INCORRECT_ELEMENT_TYPE_FOR_ARRAY(Kind.ERROR, 1061, "The array of type ''{0}'' cannot have an element of type ''{1}'' inserted"),
+	MULTIDIM_ARRAY_INITIALIZER_NOT_SUPPORTED(Kind.ERROR, 1062, "Using an initializer to build a multi-dimensional array is not currently supported"),
+	MISSING_ARRAY_DIMENSION(Kind.ERROR, 1063, "A required array dimension has not been specified"),
+	INITIALIZER_LENGTH_INCORRECT(Kind.ERROR, 1064, "array initializer size does not match array dimensions"),
+	UNEXPECTED_ESCAPE_CHAR(Kind.ERROR,1065,"unexpected escape character."),
+	OPERAND_NOT_INCREMENTABLE(Kind.ERROR,1066,"the expression component ''{0}'' does not support increment"),
+	OPERAND_NOT_DECREMENTABLE(Kind.ERROR,1067,"the expression component ''{0}'' does not support decrement"),
+	NOT_ASSIGNABLE(Kind.ERROR,1068,"the expression component ''{0}'' is not assignable"),
+	MISSING_CHARACTER(Kind.ERROR,1069,"missing expected character ''{0}''"),
+	LEFT_OPERAND_PROBLEM(Kind.ERROR,1070, "Problem parsing left operand"),
+	MISSING_SELECTION_EXPRESSION(Kind.ERROR, 1071, "A required selection expression has not been specified"),
+
+	/** @since 4.1 */
+	EXCEPTION_RUNNING_COMPILED_EXPRESSION(Kind.ERROR, 1072,
+			"An exception occurred whilst evaluating a compiled expression"),
+
+	/** @since 4.3.17 */
+	FLAWED_PATTERN(Kind.ERROR, 1073,
+			"Failed to efficiently evaluate pattern ''{0}'': consider redesigning it"),
+
+	/** @since 5.2.20 */
+	MAX_ARRAY_ELEMENTS_THRESHOLD_EXCEEDED(Kind.ERROR, 1075,
+			"Array declares too many elements, exceeding the threshold of ''{0}''");
 
 	private Kind kind;
 	private int code;
