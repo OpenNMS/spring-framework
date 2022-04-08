@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010 the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -328,7 +328,23 @@ final class Cglib2AopProxy implements AopProxy, Serializable {
 	}
 
 	/**
-	 * Wrap a return of this if necessary to be the proxy
+	 * Invoke the given method with a CGLIB MethodProxy if possible, falling back
+	 * to a plain reflection invocation in case of a fast-class generation failure.
+	 */
+	private static Object invokeMethod(Object target, Method method, Object[] args, MethodProxy methodProxy)
+			throws Throwable {
+		try {
+			return methodProxy.invoke(target, args);
+		}
+		catch (CodeGenerationException ex) {
+			logger.warn("Unable to fast-class invoke method [" + method + "] on target [" + target + "]. Falling back to reflection.");
+			return AopUtils.invokeJoinpointUsingReflection(target, method, args);
+		}
+	}
+
+	/**
+	 * Process a return value. Wraps a return of {@code this} if necessary to be the
+	 * {@code proxy} and also verifies that {@code null} is not returned as a primitive.
 	 */
 	private static Object massageReturnTypeIfNecessary(Object proxy, Object target, Method method, Object retVal) {
 		// Massage return value if necessary
@@ -378,7 +394,7 @@ final class Cglib2AopProxy implements AopProxy, Serializable {
 		}
 
 		public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
-			Object retVal = methodProxy.invoke(this.target, args);
+			Object retVal = invokeMethod(this.target, method, args, methodProxy);
 			return massageReturnTypeIfNecessary(proxy, this.target, method, retVal);
 		}
 	}
@@ -400,7 +416,7 @@ final class Cglib2AopProxy implements AopProxy, Serializable {
 			Object oldProxy = null;
 			try {
 				oldProxy = AopContext.setCurrentProxy(proxy);
-				Object retVal = methodProxy.invoke(this.target, args);
+				Object retVal = invokeMethod(this.target, method, args, methodProxy);
 				return massageReturnTypeIfNecessary(proxy, this.target, method, retVal);
 			}
 			finally {
@@ -426,7 +442,7 @@ final class Cglib2AopProxy implements AopProxy, Serializable {
 		public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
 			Object target = this.targetSource.getTarget();
 			try {
-				Object retVal = methodProxy.invoke(target, args);
+				Object retVal = invokeMethod(target, method, args, methodProxy);
 				return massageReturnTypeIfNecessary(proxy, target, method, retVal);
 			}
 			finally {
@@ -452,7 +468,7 @@ final class Cglib2AopProxy implements AopProxy, Serializable {
 			Object target = this.targetSource.getTarget();
 			try {
 				oldProxy = AopContext.setCurrentProxy(proxy);
-				Object retVal = methodProxy.invoke(target, args);
+				Object retVal = invokeMethod(target, method, args, methodProxy);
 				return massageReturnTypeIfNecessary(proxy, target, method, retVal);
 			}
 			finally {
@@ -615,7 +631,8 @@ final class Cglib2AopProxy implements AopProxy, Serializable {
 					// Note that the final invoker must be an InvokerInterceptor, so we know
 					// it does nothing but a reflective operation on the target, and no hot
 					// swapping or fancy proxying.
-					retVal = methodProxy.invoke(target, args);
+					Object[] argsToUse = AopProxyUtils.adaptArgumentsIfNecessary(method, args);
+					retVal = invokeMethod(target, method, argsToUse, methodProxy);
 				}
 				else {
 					// We need to create a method invocation...
