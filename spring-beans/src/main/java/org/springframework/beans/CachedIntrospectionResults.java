@@ -294,13 +294,15 @@ public class CachedIntrospectionResults {
 			// This call is slow so we do it once.
 			PropertyDescriptor[] pds = this.beanInfo.getPropertyDescriptors();
 			for (PropertyDescriptor pd : pds) {
-				if (Class.class == beanClass && (!"name".equals(pd.getName()) && !pd.getName().endsWith("Name"))) {
+				if (Class.class == beanClass && !("name".equals(pd.getName()) ||
+						(pd.getName().endsWith("Name") && String.class == pd.getPropertyType()))) {
 					// Only allow all name variants of Class properties
 					continue;
 				}
-				if (pd.getPropertyType() != null && (ClassLoader.class.isAssignableFrom(pd.getPropertyType())
-						|| ProtectionDomain.class.isAssignableFrom(pd.getPropertyType()))) {
-					// Ignore ClassLoader and ProtectionDomain types - nobody needs to bind to those
+				if (pd.getWriteMethod() == null && pd.getPropertyType() != null &&
+					(ClassLoader.class.isAssignableFrom(pd.getPropertyType()) ||
+						ProtectionDomain.class.isAssignableFrom(pd.getPropertyType()))) {
+					// Ignore ClassLoader and ProtectionDomain read-only properties - no need to bind to those
 					continue;
 				}
 				if (logger.isTraceEnabled()) {
@@ -310,9 +312,10 @@ public class CachedIntrospectionResults {
 									"; editor [" + pd.getPropertyEditorClass().getName() + "]" : ""));
 				}
 				pd = buildGenericTypeAwarePropertyDescriptor(beanClass, pd);
-				if (pd.getPropertyType() != null && (ClassLoader.class.isAssignableFrom(pd.getPropertyType())
-						|| ProtectionDomain.class.isAssignableFrom(pd.getPropertyType()))) {
-					// Ignore ClassLoader and ProtectionDomain types - nobody needs to bind to those
+				if (pd.getWriteMethod() == null && pd.getPropertyType() != null &&
+					(ClassLoader.class.isAssignableFrom(pd.getPropertyType()) ||
+						ProtectionDomain.class.isAssignableFrom(pd.getPropertyType()))) {
+					// Ignore ClassLoader and ProtectionDomain read-only properties - no need to bind to those
 					continue;
 				}
 				this.propertyDescriptorCache.put(pd.getName(), pd);
