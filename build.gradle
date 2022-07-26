@@ -1,6 +1,11 @@
 buildscript {
 	repositories {
-		maven { url "https://repo.spring.io/plugins-release" }
+		mavenLocal()
+		mavenCentral()
+		maven { url "https://plugins.gradle.org/m2/" }
+		maven { url "https://public.nexus.pentaho.org/content/groups/omni/" }
+		maven { url "http://docbook.sourceforge.net/maven/repository" }
+		// maven { url "https://repo.spring.io/plugins-release" }
 	}
 	dependencies {
 		classpath("org.springframework.build.gradle:propdeps-plugin:0.0.7")
@@ -18,7 +23,7 @@ configure(allprojects) { project ->
 	group = "org.springframework"
 	version = qualifyVersionIfNecessary(version)
 
-	ext.aspectjVersion  = "1.7.4"
+	ext.aspectjVersion  = "1.8.4"
 	ext.hsqldbVersion   = "1.8.0.10"
 	ext.junitVersion    = "4.11"
 	ext.slf4jVersion    = "1.6.6"
@@ -30,8 +35,8 @@ configure(allprojects) { project ->
 	apply from: "${gradleScriptDir}/ide.gradle"
 
 	compileJava {
-		sourceCompatibility=1.5
-		targetCompatibility=1.5
+		sourceCompatibility=1.6
+		targetCompatibility=1.6
 	}
 	compileTestJava {
 		sourceCompatibility=1.7
@@ -74,7 +79,12 @@ configure(allprojects) { project ->
 	}
 
 	repositories {
-		maven { url "https://repo.spring.io/libs-release" }
+		mavenLocal()
+		mavenCentral()
+		maven { url "https://plugins.gradle.org/m2/" }
+		maven { url "https://public.nexus.pentaho.org/content/groups/omni/" }
+		maven { url "http://docbook.sourceforge.net/maven/repository" }
+		maven { url "https://maven.repository.redhat.com/ga/" }
 	}
 
 	dependencies {
@@ -85,7 +95,7 @@ configure(allprojects) { project ->
 
 	ext.javadocLinks = [
 		"https://docs.oracle.com/javase/7/docs/api/",
-		"https://docs.oracle.com/javaee/6/api/",
+		"https://docs.oracle.com/javaee/7/api/",
 		"https://docs.oracle.com/cd/E13222_01/wls/docs90/javadocs/", // CommonJ
 		"https://pic.dhe.ibm.com/infocenter/wasinfo/v7r0/topic/com.ibm.websphere.javadoc.doc/web/apidocs/",
 		"https://glassfish.java.net/nonav/docs/v3/api/",
@@ -99,13 +109,12 @@ configure(allprojects) { project ->
 		"https://tiles.apache.org/framework/apidocs/",
 		"http://aopalliance.sourceforge.net/doc/",
 		"https://www.eclipse.org/aspectj/doc/released/aspectj5rt-api/",
-		"https://www.ehcache.org/apidocs/2.4.4/",
+		"https://www.ehcache.org/apidocs/2.6.9/",
 		"https://www.quartz-scheduler.org/api/2.2.2/",
 		"https://jackson.codehaus.org/1.9.4/javadoc/",
 		"https://fasterxml.github.io/jackson-core/javadoc/2.3.0/",
 		"https://fasterxml.github.io/jackson-databind/javadoc/2.3.0/",
-		"https://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/",
-		"https://ibatis.apache.org/docs/java/dev/"
+		"https://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs"
 	] as String[]
 }
 
@@ -134,9 +143,7 @@ configure(subprojects - project(":spring-build-src")) { subproject ->
 		options.author = true
 		options.header = project.name
 		options.links(project.ext.javadocLinks)
-		if (JavaVersion.current().isJava8Compatible()) {
-			options.addStringOption('Xdoclint:none', '-quiet')
-		}
+		options.addStringOption('Xdoclint:none', '-quiet')
 
 		// suppress warnings due to cross-module @see and @link references;
 		// note that global 'api' task does display all warnings.
@@ -1050,10 +1057,10 @@ configure(rootProject) {
 
 	task wrapper(type: Wrapper) {
 		description = "Generates gradlew[.bat] scripts"
-		gradleVersion = "2.5"
+		gradleVersion = "1.12"
 
 		doLast() {
-			def gradleOpts = "-XX:MaxPermSize=1024m -Xmx1024m"
+			def gradleOpts = "-XX:MaxMetaspaceSize=1024m -Xmx1024m"
 			def gradleBatOpts = "$gradleOpts -XX:MaxHeapSize=256m"
 			File wrapperFile = file("gradlew")
 			wrapperFile.text = wrapperFile.text.replace("DEFAULT_JVM_OPTS=",
