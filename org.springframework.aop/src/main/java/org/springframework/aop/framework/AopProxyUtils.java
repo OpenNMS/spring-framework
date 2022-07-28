@@ -86,10 +86,11 @@ public abstract class AopProxyUtils {
 		Class[] specifiedInterfaces = advised.getProxiedInterfaces();
 		if (specifiedInterfaces.length == 0) {
 			// No user-specified interfaces: check whether target class is an interface.
-			Class<?> targetClass = advised.getTargetClass();
+			Class targetClass = advised.getTargetClass();
 			if (targetClass != null) {
 				if (targetClass.isInterface()) {
-					advised.setInterfaces(targetClass);
+					specifiedInterfaces = new Class[] {targetClass};
+					advised.setInterfaces(specifiedInterfaces);
 				}
 				else if (Proxy.isProxyClass(targetClass)) {
 					advised.setInterfaces(targetClass.getInterfaces());
