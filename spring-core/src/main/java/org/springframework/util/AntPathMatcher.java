@@ -60,7 +60,7 @@ public class AntPathMatcher implements PathMatcher {
 
 	private String pathSeparator = DEFAULT_PATH_SEPARATOR;
 
-	private boolean trimTokens = true;
+	private boolean trimTokens = false;
 
 	private volatile Boolean cachePatterns;
 
