@@ -74,7 +74,7 @@ public class AntPathMatcher implements PathMatcher {
 
 	private PathSeparatorPatternCache pathSeparatorPatternCache;
 
-	private boolean trimTokens = true;
+	private boolean trimTokens = false;
 
 	private volatile Boolean cachePatterns;
 
